@@ -5,6 +5,9 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Microsoft.Practices.ServiceLocation;
+using WebAppCodeFirst.DAL;
+using WebAppCodeFirst.DAL.Interface;
 
 namespace WebAppCodeFirst
 {
@@ -16,6 +19,15 @@ namespace WebAppCodeFirst
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+
+        protected void Application_EndRequest()
+        {
+            var contextManager = ServiceLocator.Current.GetInstance<IContextManager<SchoolContext>>() as ContextManager<SchoolContext>;
+            if (contextManager != null)
+            {
+                contextManager.GetContext().Dispose();
+            }
         }
     }
 }
