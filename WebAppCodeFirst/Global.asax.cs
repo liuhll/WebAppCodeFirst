@@ -5,9 +5,11 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Autofac;
 using Microsoft.Practices.ServiceLocation;
 using WebAppCodeFirst.DAL;
 using WebAppCodeFirst.DAL.Interface;
+using WebAppCodeFirst.Ioc;
 
 namespace WebAppCodeFirst
 {
@@ -19,6 +21,8 @@ namespace WebAppCodeFirst
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            var iocManager = IoCConfig.IocManager(new ContainerBuilder());
+            IoCConfig.IocManager(new ContainerBuilder()).SetAutofacResolver();
         }
 
         protected void Application_EndRequest()

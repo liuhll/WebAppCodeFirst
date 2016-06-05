@@ -10,7 +10,7 @@ namespace WebAppCodeFirst.DAL
 {
     public class SchoolContext: BaseDbContext
     {
-        public SchoolContext() : base("SchoolContext")
+        public SchoolContext() : base("DefaultConnection")
         {
 
         }
