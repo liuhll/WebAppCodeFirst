@@ -21,7 +21,7 @@ namespace WebAppCodeFirst
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            var iocManager = IoCConfig.IocManager(new ContainerBuilder());
+          //  var iocManager = IoCConfig.IocManager(new ContainerBuilder());
             IoCConfig.IocManager(new ContainerBuilder()).SetAutofacResolver();
         }
 
