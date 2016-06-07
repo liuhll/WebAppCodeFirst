@@ -9,29 +9,57 @@ using WebAppCodeFirst.DAL.Interface;
 using Microsoft.Practices.ServiceLocation;
 using WebAppCodeFirst.Models;
 using System.Net;
+using PagedList;
+using WebAppCodeFirst.Controllers.Base;
 
 namespace WebAppCodeFirst.Controllers
 {
-    public class StudentController : Controller
+    public class StudentController : BaseController<Student>
     {
-        private readonly IDbContext _dbContext;
-        private readonly IDbSet<Student> _dbSet;
-
-        public StudentController()
-        {
-            var contextManager = ServiceLocator.Current.GetInstance<IContextManager<SchoolContext>>()
-               as ContextManager<SchoolContext>;
-
-            _dbContext = contextManager.GetContext();
-            _dbSet = _dbContext.Set<Student>();
-        }
-
+     
         // GET: Student
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
-            IList<Student> students = _dbSet.Where(p => 1 == 1).ToList();
-            return View(students);
-          
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+            var students = _dbSet.Where(p => true);
+
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(s => s.LastName.Contains(searchString)
+                                       || s.FirstMidName.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    students = students.OrderByDescending(s => s.LastName);
+                    break;
+                case "Date":
+                    students = students.OrderBy(s => s.EnrollmentDate);
+                    break;
+                case "date_desc":
+                    students = students.OrderByDescending(s => s.EnrollmentDate);
+                    break;
+                default:
+                    students = students.OrderBy(s => s.LastName);
+                    break;
+            }
+
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            return View(students.ToList().ToPagedList(pageNumber,pageSize));
         }
 
         public ActionResult Details(int? id)
@@ -41,7 +69,8 @@ namespace WebAppCodeFirst.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             var student = _dbSet.Find(id);
-            if (student == null) {
+            if (student == null)
+            {
                 return HttpNotFound();
             }
             return View(student);
@@ -155,6 +184,8 @@ namespace WebAppCodeFirst.Controllers
             }
             return RedirectToAction("Index");
         }
+
+
 
     }
 }
