@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using WebAppCodeFirst.Controllers.Base;
+using WebAppCodeFirst.Models;
+using WebAppCodeFirst.ViewModels;
 
 namespace WebAppCodeFirst.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController<Student>
     {
+
         public ActionResult Index()
         {
             return View();
@@ -15,9 +19,14 @@ namespace WebAppCodeFirst.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            IQueryable<EnrollmentDateGroup> data = from student in _dbSet.Where(p => true)
+                                                   group student by student.EnrollmentDate into dateGroup
+                                                   select new EnrollmentDateGroup()
+                                                   {
+                                                       EnrollmentDate = dateGroup.Key,
+                                                       StudentCount = dateGroup.Count()
+                                                   };
+            return View(data.ToList());
         }
 
         public ActionResult Contact()
